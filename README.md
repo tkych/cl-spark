@@ -1,15 +1,15 @@
-Last modified: 2013-09-10 19:03:50 tkych
+Last modified: 2013-09-10 19:14:33 tkych
 
 Version: 0.1.00
 
 
-CL-Spark
+cl-spark
 ========
 
-CL-spark generates [sparkline][Sparkline theory and practice by Edward Tufte] a string for a list of the numbers.
-CL-spark is a Common Lisp implementation of Zach Holman's [spark][spark] and Gil Gonçalves' [vspark][vspark] with little extension.
+cl-spark generates [sparkline][Sparkline theory and practice by Edward Tufte] a string for a list of the numbers.
+cl-spark is a Common Lisp implementation of Zach Holman's [spark][spark] and Gil Gonçalves' [vspark][vspark] with little extension.
 
-CL-Spark is for:
+cl-spark is for:
 
  1. quick-and-dirty task (e.g. check the number of http-requests, git-commits, temperature, etc.).
  2. deciding whether the data is worth to real data mining.
@@ -204,13 +204,13 @@ For more examples, see cl-spark/test.lisp
 Referece Manual
 ---------------
 
-#### [Function] SPARK _values_ _&key_ (_inf_ :min) (_sup_ :max) _key_
+#### [Function] SPARK _values_ _&key_ _inf_ _sup_ _key_
 
 Generates a sparkline string for a list of the real numbers.
 
   * _values_ is a list of real-numbers.
-  * _inf_ is either `:min` or  real-number (default is :min).
-  * _sup_ is either `:max` or  real-number (default is :max).
+  * _inf_ is either `:min` or  real-number (default is `:min`).
+  * _sup_ is either `:max` or  real-number (default is `:max`).
   * _key_ is a function.
 
 
@@ -220,7 +220,7 @@ A simple-vector of characters for representation of sparklines.
 Default is `#(#\▁ #\▂ #\▃ #\▄ #\▅ #\▆ #\▇ #\█)`.
 
 
-#### [Function] VSPARK _values_ _&key_ (_inf_ :min) (_sup_ :max) _key_ (_size_ 50) _title_ _labels_ (_scale?_ t) (_newline?_ t)
+#### [Function] VSPARK _values_ _&key_ _inf_ _sup_ _key_ _size_ _title_ _labels_ _scale?_ _newline?_
 
 Generates a vartical sparkline string for a list of the real numbers.
 
@@ -231,8 +231,8 @@ Generates a vartical sparkline string for a list of the real numbers.
   * _size_ is a integer (default is 50).
   * _title_ is a string or nil.
   * _labels_ is a list.
-  * _scale?_ is a boolean (default is `t`).
-  * _newline?_ is a boolean (default is `t`).
+  * _scale?_ is a boolean (default is `T`).
+  * _newline?_ is a boolean (default is `T`).
 
 
 #### [Special Variable] \*VTICKS\*
