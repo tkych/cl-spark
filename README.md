@@ -1,4 +1,4 @@
-Last modified: 2013-09-10 19:14:33 tkych
+Last modified: 2013-09-10 22:25:59 tkych
 
 Version: 0.1.00
 
@@ -11,14 +11,18 @@ cl-spark is a Common Lisp implementation of Zach Holman's [spark][spark] and Gil
 
 cl-spark is for:
 
- 1. quick-and-dirty task (e.g. check the number of http-requests, git-commits, temperature, etc.).
+ 1. quick-and-dirty tasks.
+    (e.g. check the number of http-requests, git-commits, temperature, etc.)
  2. deciding whether the data is worth to real data mining.
- 3. grasping the secret aesthetic beauty (e.g. visualizing the fibonacci sequence, you can feel the golden ratio).
+    (e.g. [monitoring Fukushima Nuclear Power Station][fukushima-monitor])
+ 3. grasping the secret aesthetic beauty.
+    (e.g. visualizing the fibonacci sequence, you can feel the golden ratio)
 
 
 [spark]:  https://github.com/holman/spark
 [vspark]: https://github.com/LuRsT/vspark
 [Sparkline theory and practice by Edward Tufte]: http://www.edwardtufte.com/bboard/q-and-a-fetch-msg?msg_id=0001OR
+[fukushima-monitor]: https://gist.github.com/tkych/6509285
 
 
 Depends-on
