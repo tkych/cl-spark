@@ -1,4 +1,4 @@
-Last modified: 2013-09-10 18:50:05 tkych
+Last modified: 2013-09-10 19:03:50 tkych
 
 Version: 0.1.00
 
@@ -6,7 +6,7 @@ Version: 0.1.00
 CL-Spark
 ========
 
-CL-spark generates [sparkline][Sparkline theory and practice by Edward Tufte] string for a list of the numbers.
+CL-spark generates [sparkline][Sparkline theory and practice by Edward Tufte] a string for a list of the numbers.
 CL-spark is a Common Lisp implementation of Zach Holman's [spark][spark] and Gil Gonçalves' [vspark][vspark] with little extension.
 
 CL-Spark is for:
