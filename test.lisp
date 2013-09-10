@@ -1,9 +1,9 @@
-;;;; Last modified: 2013-09-10 18:47:55 tkych
+;;;; Last modified: 2013-09-10 22:35:18 tkych
 
 ;; cl-spark/test.lisp
 
 ;; Copyright (c) 2013 Takaya OCHIAI <tkych.repl@gmail.com>
-;; This software is released under MIT Licence.
+;; This software is released under MIT License.
 ;; For more details, see cl-spark/LICENSE
 
 
