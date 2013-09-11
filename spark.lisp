@@ -1,4 +1,4 @@
-;;;; Last modified: 2013-09-10 22:35:12 tkych
+;;;; Last modified: 2013-09-11 tkych
 
 ;; cl-spark/spark.lisp
 
@@ -89,7 +89,7 @@ Examples:
 ")
 
 (defun spark (values &key (inf :min) (sup :max) key)
-  "Generates a sparkline string for a list of the real numbers.
+  "Generates a sparkline string for a list of real numbers.
 
 Usage: SPARK <values> &key <inf> <sup> <key>
 
@@ -152,7 +152,7 @@ Examples:
     (when (zerop unit) (setf unit 1))
 
     ;; (when *dbg*
-    ;;   (format t "~&sup: ~S~&inf: ~S~&unit: ~S~%" sup inf unit))
+    ;;   (format *debug-io* "~&sup: ~S~&inf: ~S~&unit: ~S~%" sup inf unit))
 
     (loop
        :for v :in values
@@ -224,7 +224,7 @@ Examples:
 
 (defun vspark (values &key (inf :min) (sup :max) key (size 50)
                            labels title (scale? t) (newline? t))
-  "Generates a vartical sparkline string for a list of the real numbers.
+  "Generates a vartical sparkline string for a list of real numbers.
 
 Usage: VSPARK <values> &key <inf> <sup> <key> <size>
                             <labels> <title> <scale?> <newline?>
@@ -248,8 +248,10 @@ Usage: VSPARK <values> &key <inf> <sup> <key> <size>
   * <size>     ~ maximum number of output columns (contains label).
   * <labels>   ~ labels for data.
   * <title>    ~ If title is too big for size, then not print.
-  * <scale?>   ~ If strings of inf and sup is too big for size, then not print.
-  * <newline?> ~ If T, output with newlines for easy to see.
+  * <scale?>   ~ If T, output graph with scale for easy to see.
+                 If string length of inf and sup is too big for size,
+                 then not print scale.
+  * <newline?> ~ If T, output graph with newlines for easy to see.
 
 
 Examples:
@@ -389,8 +391,8 @@ Examples:
       (when (zerop unit) (setf unit 1))
 
       ;; (when *dbg*
-      ;;   (format t "~&sup: ~S~&inf: ~S~&unit: ~S~
-      ;;              ~%num-content-ticks: ~S~%size: ~S~%"
+      ;;   (format *debug-io* "~&sup: ~S~&inf: ~S~&unit: ~S~
+      ;;                       ~%num-content-ticks: ~S~%size: ~S~%"
       ;;           sup inf unit num-content-ticks size))
 
       (loop
@@ -419,7 +421,7 @@ Examples:
   (multiple-value-bind
         (units frac) (floor (- value inf) (* unit num-content-ticks))
     ;; (when *dbg*
-    ;;   (format t "~&value:~A -> {units: ~A, frac: ~A}"
+    ;;   (format *debug-io* "~&value:~A -> {units: ~A, frac: ~A}"
     ;;           value units frac))
     (with-output-to-string (s)
       (let ((most-tick (svref *vticks* num-content-ticks)))
@@ -437,8 +439,9 @@ Examples:
                             (+ 1 size max-lengeth-label)
                             size)
                         (length title-string)) 2)))
-    ;; (when *dbg* (format t "title-string: ~S~%mid: ~A~%"
-    ;;                     title-string mid))
+    ;; (when *dbg*
+    ;;   (format *debug-io* "title-string: ~S~%mid: ~A~%"
+    ;;           title-string mid))
     (when (plusp mid)
       (format nil "~A~%"
               (replace (make-string (if max-lengeth-label
@@ -453,44 +456,40 @@ Examples:
 ;; (code-char 743) => #\MODIFIER_LETTER_MID_TONE_BAR              <=> #\˧
 ;; (code-char 746) => #\MODIFIER_LETTER_YANG_DEPARTING_TONE_MARK  <=> #\˫
 (defun generate-scale (inf sup size max-lengeth-label)
-  (let* ((inf-string (princ-to-string (ensure-non-double-float inf)))
-         (sup-string (princ-to-string (ensure-non-double-float sup)))
-         (num-padding (- size
-                         (length inf-string) (length sup-string))))
-    (when (plusp num-padding)
-      (let* ((mid (/ (+ sup inf) 2))
-             (mid-string (princ-to-string (ensure-non-double-float mid))))
-        (if (and (plusp (- num-padding (length mid-string)))
-                 (/= inf mid)
-                 (/= mid sup))
-            (string-concat
-             (if max-lengeth-label
-                 (make-string (1+ max-lengeth-label) :initial-element #\Space)
-                 "")
-             (format nil (format nil "~~~D<~A~~;~A~~;~A~~>~~%"
-                                 size inf-string mid-string sup-string))
-             (if max-lengeth-label
-                 (make-string (1+ max-lengeth-label) :initial-element #\Space)
-                 "")
-             (substitute #\- #\Space
-                         (format nil (format nil "~~~D<~A~~;~A~~;~A~~>~~%"
-                                             size #.(string (code-char 747))
-                                             #\+ #.(string (code-char 743))))))
-            (string-concat
-             (if max-lengeth-label
-                 (make-string (1+ max-lengeth-label) :initial-element #\Space)
-                 "")
-             inf-string
-             (make-string num-padding :initial-element #\Space)
-             sup-string
-             #.(format nil "~%")
-             (if max-lengeth-label
-                 (make-string (1+ max-lengeth-label) :initial-element #\Space)
-                 "")
-             #.(string (code-char 747))
-             (make-string (- size 2) :initial-element #\-)
-             #.(string (code-char 743))
-             #.(format nil "~%")))))))
+  (flet ((make-padding (max-lengeth-label)
+           (if max-lengeth-label
+               (make-string (1+ max-lengeth-label) :initial-element #\Space)
+               "")))
+    (let* ((inf-string (princ-to-string (ensure-non-double-float inf)))
+           (sup-string (princ-to-string (ensure-non-double-float sup)))
+           (num-padding (- size
+                           (length inf-string) (length sup-string))))
+      (when (plusp num-padding)
+        (let* ((mid (/ (+ sup inf) 2))
+               (mid-string (princ-to-string (ensure-non-double-float mid))))
+          (if (and (plusp (- num-padding (length mid-string)))
+                   (/= inf mid)
+                   (/= mid sup))
+              (string-concat
+               (make-padding max-lengeth-label)
+               (format nil (format nil "~~~D<~A~~;~A~~;~A~~>~~%"
+                                   size inf-string mid-string sup-string))
+               (make-padding max-lengeth-label)
+               (substitute #\- #\Space
+                           (format nil (format nil "~~~D<~A~~;~A~~;~A~~>~~%"
+                                               size #.(code-char 747)
+                                               #\+ #.(code-char 743)))))
+              (string-concat
+               (make-padding max-lengeth-label)
+               inf-string
+               (make-string num-padding :initial-element #\Space)
+               sup-string
+               #.(format nil "~%")
+               (make-padding max-lengeth-label)
+               #.(string (code-char 747))
+               (make-string (- size 2) :initial-element #\-)
+               #.(string (code-char 743))
+               #.(format nil "~%"))))))))
 
 
 ;;====================================================================
