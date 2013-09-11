@@ -1,4 +1,4 @@
-Last modified: 2013-09-10 22:25:59 tkych
+Last modified: 2013-09-11 tkych
 
 Version: 0.1.00
 
@@ -6,14 +6,14 @@ Version: 0.1.00
 cl-spark
 ========
 
-cl-spark generates [sparkline][Sparkline theory and practice by Edward Tufte] a string for a list of the numbers.
+cl-spark generates [sparkline][Sparkline theory and practice by Edward Tufte] a string for a list of the real numbers.
 cl-spark is a Common Lisp implementation of Zach Holman's [spark][spark] and Gil Gonçalves' [vspark][vspark] with little extension.
 
-cl-spark is for:
+The goal of cl-spark is quick data visualization for:
 
- 1. quick-and-dirty tasks.
+ 1. quick-and-dirty tasks,
     (e.g. check the number of http-requests, git-commits, temperature, etc.)
- 2. deciding whether the data is worth to real data mining.
+ 2. deciding whether the data is worth to real data mining,
     (e.g. [monitoring Fukushima Nuclear Power Station][fukushima-monitor])
  3. grasping the secret aesthetic beauty.
     (e.g. visualizing the fibonacci sequence, you can feel the golden ratio)
@@ -210,7 +210,7 @@ Referece Manual
 
 #### [Function] SPARK _values_ _&key_ _inf_ _sup_ _key_
 
-Generates a sparkline string for a list of the real numbers.
+Generates a sparkline string for a list of real numbers.
 
   * _values_ is a list of real-numbers.
   * _inf_ is either `:min` or  real-number (default is `:min`).
@@ -226,7 +226,7 @@ Default is `#(#\▁ #\▂ #\▃ #\▄ #\▅ #\▆ #\▇ #\█)`.
 
 #### [Function] VSPARK _values_ _&key_ _inf_ _sup_ _key_ _size_ _title_ _labels_ _scale?_ _newline?_
 
-Generates a vartical sparkline string for a list of the real numbers.
+Generates a vartical sparkline string for a list of real numbers.
 
   * _values_ is a list of real-numbers.
   * _inf_ is either `:min` or real-number (default is `:min`).
