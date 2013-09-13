@@ -1,4 +1,4 @@
-;;;; Last modified: 2013-09-10 22:35:04 tkych
+;;;; Last modified: 2013-09-13 19:24:46 tkych
 
 ;; cl-spark/cl-spark.asd
 
@@ -34,7 +34,7 @@ Gil Gonçalves' `vspark' with little extention.
  * vspark:   https://github.com/LuRsT/vspark
  * cl-spark: https://github.com/tkych/cl-spark
 "
-  :version     "0.1.00"
+  :version     "0.1.01"
   :licence     "MIT License"
   :author      "Takaya OCHIAI <tkych.repl@gmail.com>"
   :components  ((:file "spark"))

@@ -1,4 +1,4 @@
-;;;; Last modified: 2013-09-10 22:35:18 tkych
+;;;; Last modified: 2013-09-13 19:22:30 tkych
 
 ;; cl-spark/test.lisp
 
@@ -72,14 +72,14 @@
 ;; `inf/sup' idea is due to A. Gordon's `SPARK_MIN/SPARK_MAX' env
 ;; variables. I think this idea is not good for the original spark.
 ;; Because original spark is shell script, using pipeline might be
-;; same work. But in Common Lisp this is good idea.
+;; same work. But in common lisp this is good idea, I think.
 ;; If sequence functions (e.g. find, remove, substitute, etc.) does not
 ;; have any keywords, it is inconvenient.
 ;; For example, thoguh the followings are all same work, the no.1 is
-;; the most readable.
-;;  1. (spark '(0 1 2 3 4 5 6 7 8 9 10) :inf 5)
-;;  2. (spark '(0 1 2 3 4 5 6 7 8 9 10) :key (lambda (x) (max 5 x)))
-;;  3. (spark (mapcar (lambda (x) (max 5 x)) '(0 1 2 3 4 5 6 7 8 9 10)))
+;; the most readable and convenient.
+;;  1. (spark '(0 1 2 3 4 5 6 7 8 9 10) :inf 5 :sup 8)
+;;  2. (spark '(0 1 2 3 4 5 6 7 8 9 10) :key (lambda (x) (min 8 (max 5 x))))
+;;  3. (spark (mapcar (lambda (x) (min 8 (max 5 x))) '(0 1 2 3 4 5 6 7 8 9 10)))
 
 
 (=>? (spark '(0 30 55 80 33 150) :inf -100)
@@ -127,22 +127,22 @@
 
 ;;; key
 
-(defun range (start last)
-  (loop :for i :from start :to last :collect i))
+(defun range (start end)
+  (loop :for i :from start :below end :collect i))
 
-(=>? (spark (range 0 50)
+(=>? (spark (range 0 51)
             :key (lambda (x) (sin (* x pi 1/4))))
      "▄▆█▆▄▂▁▂▄▆█▆▄▂▁▂▄▆█▆▄▂▁▂▄▆█▆▄▂▁▂▄▆█▆▄▂▁▂▄▆█▆▄▂▁▂▄▆█")
 
-(=>? (spark (range 0 50)
+(=>? (spark (range 0 51)
             :key (lambda (x) (cos (* x pi 1/4))))
      "█▆▄▂▁▂▄▆█▆▄▂▁▂▄▆█▆▄▂▁▂▄▆█▆▄▂▁▂▄▆█▆▄▂▁▂▄▆█▆▄▂▁▂▄▆█▆▄")
 
-(=>? (spark (range 0 50)
+(=>? (spark (range 0 51)
             :key (lambda (x) (abs (cis (* x pi 1/4)))))
      "▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁")
 
-(=>? (spark (range 0 50)
+(=>? (spark (range 0 51)
             :key (lambda (x) (float (phase (cis (* x pi 1/4))) 1.0)))
      "▄▅▆▇█▁▁▂▄▅▆▇█▁▁▂▄▅▆▇█▁▁▂▄▅▆▇█▁▁▂▄▅▆▇█▁▁▂▄▅▆▇█▁▁▂▄▅▆")
 
@@ -160,13 +160,13 @@
                  (rec (1- n) (* n acc)))))
     (rec n 1)))
 
-(=>? (spark '(1 2 3 4 5 6) :key #'log)   "▁▃▅▆▇█")
-(=>? (spark '(1 2 3 4 5 6) :key #'sqrt)  "▁▃▄▅▆█")
-(=>? (spark '(1 2 3 4 5 6))              "▁▂▃▅▆█")
-(=>? (spark '(1 2 3 4 5 6) :key #'fib)   "▁▁▂▃▅█")
-(=>? (spark '(1 2 3 4 5 6) :key #'exp)   "▁▁▁▁▃█")
-(=>? (spark '(1 2 3 4 5 6) :key #'fac)   "▁▁▁▁▂█")
-(=>? (spark '(1 2 3 4 5 6) :key #'isqrt) "▁▁▁███")
+(=>? (spark (range 1 7) :key #'log)   "▁▃▅▆▇█")
+(=>? (spark (range 1 7) :key #'sqrt)  "▁▃▄▅▆█")
+(=>? (spark (range 1 7))              "▁▂▃▅▆█")
+(=>? (spark (range 1 7) :key #'fib)   "▁▁▂▃▅█")
+(=>? (spark (range 1 7) :key #'exp)   "▁▁▁▁▃█")
+(=>? (spark (range 1 7) :key #'fac)   "▁▁▁▁▂█")
+(=>? (spark (range 1 7) :key #'isqrt) "▁▁▁███")
 
 
 ;;; misc
@@ -192,19 +192,20 @@
 
 ;; singleton
 (=>? (vspark '(1))
+
 "
-0                       1                        2
+1                      1.5                       2
 ˫-----------------------+------------------------˧
-█████████████████████████▏
+▏
 ")
 
 ;; constant
 (=>? (vspark '(1 1))
 "
-0                       1                        2
+1                      1.5                       2
 ˫-----------------------+------------------------˧
-█████████████████████████▏
-█████████████████████████▏
+▏
+▏
 ")
 
 
@@ -422,5 +423,29 @@ Eastern Mediterranean ████████████████▊
                Global ██████████████████▋
 ")
 
+
+(=>? (spark (range 0 15) :key #'fib)
+"▁▁▁▁▁▁▁▁▁▁▂▂▃▅█")
+
+(=>? (vspark (range 0 15) :key #'fib)
+"
+0                    188.5                     377
+˫-----------------------+------------------------˧
+▏
+▏
+▏
+▎
+▍
+▋
+█▏
+█▊
+██▊
+████▌
+███████▍
+███████████▊
+███████████████████▏
+██████████████████████████████▉
+██████████████████████████████████████████████████
+")
 
 ;;====================================================================

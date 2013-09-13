@@ -1,3 +1,30 @@
+Last modified: 2013-09-13 19:36:51 tkych
+
+cl-spark/CHANGELOG
+
+
+Version 0.1.01
+2013-09-13
+Fixed Bug: VSPARK: If all values are under the inf,
+                   then sparkline becomes incorrect.
+e.g.
+(vspark '(1 2) :inf 10)
+=>
+"
+9                      10                       11
+˫-----------------------+------------------------˧
+█████████████████████████▏
+█████████████████████████▏
+"
+
+Fixed:
+=>
+"
+10                     10.5                     11
+˫-----------------------+------------------------˧
+▏
+▏
+"
 
 Version 0.1.00
 2013-09-10

@@ -1,4 +1,4 @@
-;;;; Last modified: 2013-09-11 tkych
+;;;; Last modified: 2013-09-13 19:21:51 tkych
 
 ;; cl-spark/spark.lisp
 
@@ -256,15 +256,17 @@ Usage: VSPARK <values> &key <inf> <sup> <key> <size>
 
 Examples:
 
-  (defvar life-expectancy '((\"Africa\" 56)
-                            (\"Americans\" 76)
-                            (\"South-East Asia\" 67)
-                            (\"Europe\" 76)
-                            (\"Eastern Mediterranean\" 68)
-                            (\"Western Pacific\" 76)
-                            (\"Global\" 70)))
+  ;; Life expectancy by WHO region, 2011, bothsexes
+  ;; c.f. http://apps.who.int/gho/data/view.main.690
+  (defvar life-expectancies '((\"Africa\" 56)
+                              (\"Americans\" 76)
+                              (\"South-East Asia\" 67)
+                              (\"Europe\" 76)
+                              (\"Eastern Mediterranean\" 68)
+                              (\"Western Pacific\" 76)
+                              (\"Global\" 70)))
 
-  (vspark life-expectancy :key #'second :scale? nil :newline? nil)
+  (vspark life-expectancies :key #'second :scale? nil :newline? nil)
   =>
   \"▏
   ██████████████████████████████████████████████████
@@ -274,10 +276,10 @@ Examples:
   ██████████████████████████████████████████████████
   ███████████████████████████████████▏\"
 
-  (vspark life-expectancy :inf 50 :sup 80
-                          :key    #'second
-                          :labels (mapcar #'first life-expectancy)
-                          :title \"Life Expectancy\")
+  (vspark life-expectancies :inf 50 :sup 80
+                            :key    #'second
+                            :labels (mapcar #'first life-expectancies)
+                            :title \"Life Expectancy\")
   =>
   \"
                    Life Expectancy                  
@@ -290,6 +292,22 @@ Examples:
   Eastern Mediterranean ████████████████▊
         Western Pacific ████████████████████████▎
                  Global ██████████████████▋
+  \"
+
+  (vspark '(0 1 2 3 4 5 6 7 8) :key (lambda (x) (sin (* x pi 1/4)))
+                               :size 20)
+  \"
+  -1.0     0.0     1.0
+  ˫--------+---------˧
+  ██████████▏
+  █████████████████▏
+  ████████████████████
+  █████████████████▏
+  ██████████▏
+  ██▉
+  ▏
+  ██▉
+  █████████▉
   \"
 
   (vspark '(0 1 2 3 4 5 6 7 8) :key (lambda (x) (sin (* x pi 1/4)))
@@ -354,7 +372,7 @@ Examples:
 
   ;; Check sup ~ inf
   (cond ((< sup inf) (error "sup ~S < inf ~S." sup inf))
-        ((= sup inf) (incf sup) (decf inf)) ;ensure all bars are in mid.
+        ((= sup inf) (incf sup))  ;ensure all bars are in inf.
         (t nil))
 
   (let ((max-lengeth-label nil))
