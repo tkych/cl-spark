@@ -1,6 +1,6 @@
-Last modified: 2013-09-13 19:24:51 tkych
+Last modified: 2013-09-16 10:13:26 tkych
 
-Version: 0.1.01
+Version: 0.1.02
 
 
 cl-spark
@@ -51,11 +51,11 @@ Examples
     (spark '(1 0 1 0 .5)) => "█▁█▁▄"
     (spark '(1 0 1 0 -1)) => "█▄█▄▁"
 
-    ;; inf, sup
+    ;; min, max
     (spark '(0 30 55 80 33 150))                 => "▁▂▃▅▂█"
-    (spark '(0 30 55 80 33 150) :inf -100)       => "▃▄▅▆▄█"
-    (spark '(0 30 55 80 33 150) :sup 50)         => "▁▅██▅█"
-    (spark '(0 30 55 80 33 150) :inf 30 :sup 80) => "▁▁▄█▁█"
+    (spark '(0 30 55 80 33 150) :min -100)       => "▃▄▅▆▄█"
+    (spark '(0 30 55 80 33 150) :max 50)         => "▁▅██▅█"
+    (spark '(0 30 55 80 33 150) :min 30 :max 80) => "▁▁▄█▁█"
 
     ;; key
     (spark '(0 1 2 3 4 5 6 7 8) :key (lambda (x) (sin (* x pi 1/4))))
@@ -111,7 +111,7 @@ Examples
     "
 
     (vspark life-expectancies :key #'second
-                              :inf 50 :sup 80
+                              :min 50 :max 80
                               :labels (mapcar #'first life-expectancies)
                               :title "Life Expectancy")
     =>
@@ -208,14 +208,14 @@ For more examples, see cl-spark/test.lisp
 Referece Manual
 ---------------
 
-#### [Function] SPARK _values_ _&key_ _inf_ _sup_ _key_
+#### [Function] SPARK _values_ _&key_ _min_ _max_ _key_
 
 Generates a sparkline string for a list of real numbers.
 
-  * _values_ is a list of real-numbers.
-  * _inf_ is either `:min` or  real-number (default is `:min`).
-  * _sup_ is either `:max` or  real-number (default is `:max`).
-  * _key_ is a function.
+  * _values_ is a data, list of real-numbers.
+  * _min_ is lower bound of output, either `nil` or  real-number (default is `NIL`, the maximum value of the data).
+  * _max_ is upper bound of output, either `nil` or  real-number (default is `NIL`, the minimum value of the data).
+  * _key_ is a function for preparing data.
 
 
 #### [Special Variable] \*TICKS\*
@@ -224,19 +224,20 @@ A simple-vector of characters for representation of sparklines.
 Default is `#(#\▁ #\▂ #\▃ #\▄ #\▅ #\▆ #\▇ #\█)`.
 
 
-#### [Function] VSPARK _values_ _&key_ _inf_ _sup_ _key_ _size_ _title_ _labels_ _scale?_ _newline?_
+#### [Function] VSPARK _values_ _&key_ _min_ _max_ _key_ _size_ _title_ _labels_ _scale?_ _newline?_
 
 Generates a vartical sparkline string for a list of real numbers.
 
-  * _values_ is a list of real-numbers.
-  * _inf_ is either `:min` or real-number (default is `:min`).
-  * _sup_ is either `:max` or real-number (default is `:max`).
-  * _key_ is a function.
-  * _size_ is a integer (default is 50).
-  * _title_ is a string or nil.
-  * _labels_ is a list.
-  * _scale?_ is a boolean (default is `T`).
-  * _newline?_ is a boolean (default is `T`).
+  * _values_ is a data, list of real-numbers.
+  * _min_ is lower bound of output, either `nil` or real-number (default is `NIL`, the maximum value of the data).
+  * _max_ is upper bound of output, either `nil` or real-number (default is `NIL`, the minimum value of the data.).
+  * _key_ is a function for preparing data.
+  * _size_ is a maximum number of output columns (contains label), integer (default is 50).
+  * _title_ is a title for data, string or nil. If title is too big for size, then not print.
+  * _labels_ is a labels for data, list.
+  * _scale?_ is a boolean (default is `T`). If T, output graph with scale for easy to see.
+    If string length of min and max is too big for size, then not print scale.
+  * _newline?_ is a boolean (default is `T`). If T, output graph with newlines for easy to see.
 
 
 #### [Special Variable] \*VTICKS\*

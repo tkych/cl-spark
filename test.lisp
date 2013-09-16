@@ -1,4 +1,4 @@
-;;;; Last modified: 2013-09-13 19:22:30 tkych
+;;;; Last modified: 2013-09-16 09:48:36 tkych
 
 ;; cl-spark/test.lisp
 
@@ -67,9 +67,9 @@
      "▁▁")
 
 
-;;; inf, sup
+;;; min, max
 
-;; `inf/sup' idea is due to A. Gordon's `SPARK_MIN/SPARK_MAX' env
+;; `min/max' idea is due to A. Gordon's `SPARK_MIN/SPARK_MAX' env
 ;; variables. I think this idea is not good for the original spark.
 ;; Because original spark is shell script, using pipeline might be
 ;; same work. But in common lisp this is good idea, I think.
@@ -77,18 +77,18 @@
 ;; have any keywords, it is inconvenient.
 ;; For example, thoguh the followings are all same work, the no.1 is
 ;; the most readable and convenient.
-;;  1. (spark '(0 1 2 3 4 5 6 7 8 9 10) :inf 5 :sup 8)
+;;  1. (spark '(0 1 2 3 4 5 6 7 8 9 10) :min 5 :max 8)
 ;;  2. (spark '(0 1 2 3 4 5 6 7 8 9 10) :key (lambda (x) (min 8 (max 5 x))))
 ;;  3. (spark (mapcar (lambda (x) (min 8 (max 5 x))) '(0 1 2 3 4 5 6 7 8 9 10)))
 
 
-(=>? (spark '(0 30 55 80 33 150) :inf -100)
+(=>? (spark '(0 30 55 80 33 150) :min -100)
      "▃▄▅▆▄█")
 
-(=>? (spark '(0 30 55 80 33 150) :sup 50)
+(=>? (spark '(0 30 55 80 33 150) :max 50)
      "▁▅██▅█")
 
-(=>? (spark '(0 30 55 80 33 150) :inf 30 :sup 80)
+(=>? (spark '(0 30 55 80 33 150) :min 30 :max 80)
      "▁▁▄█▁█")
 
 
@@ -222,9 +222,9 @@
 ")
 
 
-;;; inf, sup
+;;; min, max
 
-(=>? (vspark '(0 30 55 80 33 150) :inf -100)
+(=>? (vspark '(0 30 55 80 33 150) :min -100)
 "
 -100                    25                     150
 ˫-----------------------+------------------------˧
@@ -236,7 +236,7 @@
 ██████████████████████████████████████████████████
 ")
 
-(=>? (vspark '(0 30 55 80 33 150) :sup 50)
+(=>? (vspark '(0 30 55 80 33 150) :max 50)
 "
 0                      25                       50
 ˫-----------------------+------------------------˧
@@ -249,7 +249,7 @@
 ")
 
 
-(=>? (vspark '(0 30 55 80 33 150) :inf 30 :sup 80)
+(=>? (vspark '(0 30 55 80 33 150) :min 30 :max 80)
 "
 30                      55                      80
 ˫-----------------------+------------------------˧
@@ -406,7 +406,7 @@ Eastern Mediterranean ████████████████▊
 
 ;;; title
 (=>? (vspark life-expectancies
-             :inf 50 :sup 80
+             :min 50 :max 80
              :key    #'second
              :labels (mapcar #'first life-expectancies)
              :title "Life Expectancy")

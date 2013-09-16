@@ -1,4 +1,4 @@
-;;;; Last modified: 2013-09-13 19:21:51 tkych
+;;;; Last modified: 2013-09-16 10:04:19 tkych
 
 ;; cl-spark/spark.lisp
 
@@ -88,21 +88,21 @@ Examples:
 
 ")
 
-(defun spark (values &key (inf :min) (sup :max) key)
+(defun spark (values &key min max key)
   "Generates a sparkline string for a list of real numbers.
 
-Usage: SPARK <values> &key <inf> <sup> <key>
+Usage: SPARK <values> &key <min> <max> <key>
 
   * <values> ::= <list> of <real-number>
-  * <inf>    ::= { :min | <real-number> }, default is :min
-  * <sup>    ::= { :max | <real-number> }, default is :max
+  * <min>    ::= { <null> | <real-number> }, default is NIL
+  * <max>    ::= { <null> | <real-number> }, default is NIL
   * <key>    ::= <function>
 
   * <values> ~ data.
-  * <inf>    ~ lower bound of output.
-               :max means the maximum value of the data.
-  * <sup>    ~ upper bound of output.
-               :min means the minimum value of the data.
+  * <min>    ~ lower bound of output.
+               NIL means the maximum value of the data.
+  * <max>    ~ upper bound of output.
+               NIL means the minimum value of the data.
   * <key>    ~ function for preparing data.
 
 Examples:
@@ -112,9 +112,9 @@ Examples:
   (spark '(1 0 1 0 -1))  => \"█▄█▄▁\"
 
   (spark '(0 30 55 80 33 150))                 => \"▁▂▃▅▂█\"
-  (spark '(0 30 55 80 33 150) :inf -100)       => \"▃▄▅▆▄█\"
-  (spark '(0 30 55 80 33 150) :sup 50)         => \"▁▅██▅█\"
-  (spark '(0 30 55 80 33 150) :inf 30 :sup 80) => \"▁▁▄█▁█\"
+  (spark '(0 30 55 80 33 150) :min -100)       => \"▃▄▅▆▄█\"
+  (spark '(0 30 55 80 33 150) :max 50)         => \"▁▅██▅█\"
+  (spark '(0 30 55 80 33 150) :min 30 :max 80) => \"▁▁▄█▁█\"
 
   (spark '(0 1 2 3 4 5 6 7 8) :key (lambda (x) (sin (* x pi 1/4))))
   => \"▄▆█▆▄▂▁▂▄\"
@@ -124,8 +124,8 @@ Examples:
  For more examples, see cl-spark/test.lisp
 "
   (check-type values list)
-  (check-type inf    (or real (and keyword (member :min))))
-  (check-type sup    (or real (and keyword (member :max))))
+  (check-type min    (or null real))
+  (check-type max    (or null real))
   (check-type key    (or null function))
 
   (when key (setf values (mapcar key values)))
@@ -134,29 +134,29 @@ Examples:
   (when (null values)
     (RETURN-FROM spark ""))
 
-  ;; Ensure inf is the minimum value
-  (if (eq inf :min)
-      (setf inf (reduce #'min values))
-      (setf values (mapcar (lambda (n) (max n inf)) values)))
+  ;; Ensure min is the minimum value
+  (if (null min)
+      (setf min (reduce #'min values))
+      (setf values (mapcar (lambda (n) (max n min)) values)))
 
-  ;; Ensure sup is the maximum value
-  (if (eq sup :max)
-      (setf sup (reduce #'max values))
-      (setf values (mapcar (lambda (n) (min n sup)) values)))
+  ;; Ensure max is the maximum value
+  (if (null max)
+      (setf max (reduce #'max values))
+      (setf values (mapcar (lambda (n) (min n max)) values)))
 
-  (when (< sup inf)
-    (error "sup ~S < inf ~S." sup inf))
+  (when (< max min)
+    (error "max ~S < min ~S." max min))
 
-  (let ((unit (/ (- sup inf) (1- (length *ticks*)))))
+  (let ((unit (/ (- max min) (1- (length *ticks*)))))
 
     (when (zerop unit) (setf unit 1))
 
     ;; (when *dbg*
-    ;;   (format *debug-io* "~&sup: ~S~&inf: ~S~&unit: ~S~%" sup inf unit))
+    ;;   (format *debug-io* "~&max: ~S~&min: ~S~&unit: ~S~%" max min unit))
 
     (loop
        :for v :in values
-       :for nth := (floor (- v inf) unit)
+       :for nth := (floor (- v min) unit)
        ;; :do (when *dbg* (format t "~&~S -> ~S" v nth))
        :collect (svref *ticks* nth) :into acc
        :finally (return (coerce acc 'string)))))
@@ -222,16 +222,16 @@ Examples:
 ")
 
 
-(defun vspark (values &key (inf :min) (sup :max) key (size 50)
+(defun vspark (values &key min max key (size 50)
                            labels title (scale? t) (newline? t))
   "Generates a vartical sparkline string for a list of real numbers.
 
-Usage: VSPARK <values> &key <inf> <sup> <key> <size>
+Usage: VSPARK <values> &key <min> <max> <key> <size>
                             <labels> <title> <scale?> <newline?>
 
   * <values>   ::= <list> of <real-number>
-  * <inf>      ::= { :min | <real-number> }, default is :min
-  * <sup>      ::= { :max | <real-number> }, default is :max
+  * <min>      ::= { <null> | <real-number> }, default is NIL
+  * <max>      ::= { <null> | <real-number> }, default is NIL
   * <key>      ::= <function>
   * <size>     ::= <integer 1 *>, default is 50
   * <labels>   ::= <list>
@@ -240,16 +240,16 @@ Usage: VSPARK <values> &key <inf> <sup> <key> <size>
   * <newline?> ::= <boolean>, default is T
 
   * <values>   ~ data.
-  * <inf>      ~ lower bound of output.
-                 :max means the maximum value of the data.
-  * <sup>      ~ upper bound of output.
-                 :min means the minimum value of the data.
+  * <min>      ~ lower bound of output.
+                 NIL means the maximum value of the data.
+  * <max>      ~ upper bound of output.
+                 NIL means the minimum value of the data.
   * <key>      ~ function for preparing data.
   * <size>     ~ maximum number of output columns (contains label).
   * <labels>   ~ labels for data.
   * <title>    ~ If title is too big for size, then not print.
   * <scale?>   ~ If T, output graph with scale for easy to see.
-                 If string length of inf and sup is too big for size,
+                 If string length of min and max is too big for size,
                  then not print scale.
   * <newline?> ~ If T, output graph with newlines for easy to see.
 
@@ -276,7 +276,7 @@ Examples:
   ██████████████████████████████████████████████████
   ███████████████████████████████████▏\"
 
-  (vspark life-expectancies :inf 50 :sup 80
+  (vspark life-expectancies :min 50 :max 80
                             :key    #'second
                             :labels (mapcar #'first life-expectancies)
                             :title \"Life Expectancy\")
@@ -345,8 +345,8 @@ Examples:
   For more examples, see cl-spark/test.lisp
 "
   (check-type values   list)
-  (check-type inf      (or real (and keyword (member :min))))
-  (check-type sup      (or real (and keyword (member :max))))
+  (check-type min      (or null real))
+  (check-type max      (or null real))
   (check-type key      (or null function))
   (check-type size     (integer 1 *))
   (check-type title    (or null string))
@@ -360,19 +360,19 @@ Examples:
   (when (null values)
     (RETURN-FROM vspark ""))
 
-  ;; Ensure inf is the minimum value
-  (if (eq inf :min)
-      (setf inf (reduce #'min values))
-      (setf values (mapcar (lambda (n) (max n inf)) values)))
+  ;; Ensure min is the minimum value
+  (if (null min)
+      (setf min (reduce #'min values))
+      (setf values (mapcar (lambda (n) (max n min)) values)))
 
-  ;; Ensure sup is the maximum value
-  (if (eq sup :max)
-      (setf sup (reduce #'max values))
-      (setf values (mapcar (lambda (n) (min n sup)) values)))
+  ;; Ensure max is the maximum value
+  (if (null max)
+      (setf max (reduce #'max values))
+      (setf values (mapcar (lambda (n) (min n max)) values)))
 
-  ;; Check sup ~ inf
-  (cond ((< sup inf) (error "sup ~S < inf ~S." sup inf))
-        ((= sup inf) (incf sup))  ;ensure all bars are in inf.
+  ;; Check max ~ min
+  (cond ((< max min) (error "max ~S < min ~S." max min))
+        ((= max min) (incf max))  ;ensure all bars are in min.
         (t nil))
 
   (let ((max-lengeth-label nil))
@@ -383,7 +383,7 @@ Examples:
                ;; Add padding lacking labels not to miss data
                (setf labels (append labels (loop :repeat diff :collect ""))))
               ((minusp diff)
-               ;; Remove superfluous labels to remove redundant spaces
+               ;; Remove maxerfluous labels to remove redundant spaces
                (setf labels (butlast labels (abs diff))))
               (t nil)))
       ;; Find max-lengeth-label
@@ -404,25 +404,25 @@ Examples:
       (setf size (max 1 (- size 1 max-lengeth-label))))
 
     (let* ((num-content-ticks (1- (length *vticks*)))
-           (unit (/ (- sup inf) (* size num-content-ticks)))
+           (unit (/ (- max min) (* size num-content-ticks)))
            (result '()))
       (when (zerop unit) (setf unit 1))
 
       ;; (when *dbg*
-      ;;   (format *debug-io* "~&sup: ~S~&inf: ~S~&unit: ~S~
+      ;;   (format *debug-io* "~&max: ~S~&min: ~S~&unit: ~S~
       ;;                       ~%num-content-ticks: ~S~%size: ~S~%"
-      ;;           sup inf unit num-content-ticks size))
+      ;;           max min unit num-content-ticks size))
 
       (loop
          :for v :in values
          :for i :from 0
          :do (when labels (push (nth i labels) result))
-         :do (push (generate-bar v unit inf sup num-content-ticks)
+         :do (push (generate-bar v unit min max num-content-ticks)
                    result)
          :finally (setf result (nreverse result)))
 
       (when scale?
-        (awhen (generate-scale inf sup size max-lengeth-label)
+        (awhen (generate-scale min max size max-lengeth-label)
           (push it result)))
 
       (when title
@@ -435,18 +435,18 @@ Examples:
                              (apply #'string-concat result)))
       )))
 
-(defun generate-bar (value unit inf sup num-content-ticks)
+(defun generate-bar (value unit min max num-content-ticks)
   (multiple-value-bind
-        (units frac) (floor (- value inf) (* unit num-content-ticks))
+        (units frac) (floor (- value min) (* unit num-content-ticks))
     ;; (when *dbg*
     ;;   (format *debug-io* "~&value:~A -> {units: ~A, frac: ~A}"
     ;;           value units frac))
     (with-output-to-string (s)
       (let ((most-tick (svref *vticks* num-content-ticks)))
         (dotimes (i units) (princ most-tick s))
-        (unless (= value sup)
-          ;; sup value need not frac.
-          ;; if value = sup, then always frac = 0.
+        (unless (= value max)
+          ;; max value need not frac.
+          ;; if value = max, then always frac = 0.
           (princ (svref *vticks* (floor frac unit))
                  s))
         (terpri s)))))
@@ -473,25 +473,25 @@ Examples:
 
 ;; (code-char 743) => #\MODIFIER_LETTER_MID_TONE_BAR              <=> #\˧
 ;; (code-char 746) => #\MODIFIER_LETTER_YANG_DEPARTING_TONE_MARK  <=> #\˫
-(defun generate-scale (inf sup size max-lengeth-label)
+(defun generate-scale (min max size max-lengeth-label)
   (flet ((make-padding (max-lengeth-label)
            (if max-lengeth-label
                (make-string (1+ max-lengeth-label) :initial-element #\Space)
                "")))
-    (let* ((inf-string (princ-to-string (ensure-non-double-float inf)))
-           (sup-string (princ-to-string (ensure-non-double-float sup)))
+    (let* ((min-string (princ-to-string (ensure-non-double-float min)))
+           (max-string (princ-to-string (ensure-non-double-float max)))
            (num-padding (- size
-                           (length inf-string) (length sup-string))))
+                           (length min-string) (length max-string))))
       (when (plusp num-padding)
-        (let* ((mid (/ (+ sup inf) 2))
+        (let* ((mid (/ (+ max min) 2))
                (mid-string (princ-to-string (ensure-non-double-float mid))))
           (if (and (plusp (- num-padding (length mid-string)))
-                   (/= inf mid)
-                   (/= mid sup))
+                   (/= min mid)
+                   (/= mid max))
               (string-concat
                (make-padding max-lengeth-label)
                (format nil (format nil "~~~D<~A~~;~A~~;~A~~>~~%"
-                                   size inf-string mid-string sup-string))
+                                   size min-string mid-string max-string))
                (make-padding max-lengeth-label)
                (substitute #\- #\Space
                            (format nil (format nil "~~~D<~A~~;~A~~;~A~~>~~%"
@@ -499,9 +499,9 @@ Examples:
                                                #\+ #.(code-char 743)))))
               (string-concat
                (make-padding max-lengeth-label)
-               inf-string
+               min-string
                (make-string num-padding :initial-element #\Space)
-               sup-string
+               max-string
                #.(format nil "~%")
                (make-padding max-lengeth-label)
                #.(string (code-char 747))

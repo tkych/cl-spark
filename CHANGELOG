@@ -1,7 +1,11 @@
-Last modified: 2013-09-13 19:36:51 tkych
+Last modified: 2013-09-16 10:07:28 tkych
 
 cl-spark/CHANGELOG
 
+
+Version 0.1.02
+2013-09-16
+Renamed: inf -> min, sup -> max.
 
 Version 0.1.01
 2013-09-13
