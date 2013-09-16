@@ -1,4 +1,4 @@
-Last modified: 2013-09-16 10:13:26 tkych
+Last modified: 2013-09-16 21:51:10 tkych
 
 Version: 0.1.02
 
@@ -7,7 +7,7 @@ cl-spark
 ========
 
 cl-spark generates a [sparkline][Sparkline theory and practice by Edward Tufte] string for a list of numbers.
-cl-spark is a common lisp implementation of Zach Holman's [spark][spark] and Gil Gonçalves' [vspark][vspark] with little extension.
+It is a common lisp implementation of Zach Holman's [spark][spark] and Gil Gonçalves' [vspark][vspark] with little extension.
 
 The goal of cl-spark is quick data visualization for:
 
@@ -19,10 +19,17 @@ The goal of cl-spark is quick data visualization for:
     (e.g. visualizing the fibonacci sequence, you can feel the golden ratio)
 
 
+Note:
+
+ * The character encoding of cl-spark must be `utf-8`.
+   If your lisp is `ccl`, you need [option][ccl-optione] `$ ccl -K utf-8` when you start `ccl` in shell.
+
+
 [spark]:  https://github.com/holman/spark
 [vspark]: https://github.com/LuRsT/vspark
 [Sparkline theory and practice by Edward Tufte]: http://www.edwardtufte.com/bboard/q-and-a-fetch-msg?msg_id=0001OR
 [fukushima-monitor]: https://gist.github.com/tkych/6509285
+[ccl-optione]: http://ccl.clozure.com/manual/chapter2.5.html#Command-Line-Options
 
 
 Depends-on
@@ -34,7 +41,7 @@ Depends-on
 Installation
 ------------
 
- 0. SHELL$   `git clone https://github.com/tkych/cl-spark.git`
+ 0. SHELL$   `git clone https://github.com/tkych/cl-spark`
  1. CL-REPL> `(push #p"/path-to-cl-spark/cl-spark/" asdf:*central-registry*)`
  2. CL-REPL> `(ql:quickload :cl-spark)` or `(asdf:load-system :cl-spark)`
 
