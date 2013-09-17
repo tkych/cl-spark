@@ -1,4 +1,4 @@
-Last modified: 2013-09-16 21:51:10 tkych
+Last modified: 2013-09-17 21:02:33 tkych
 
 Version: 0.1.02
 
@@ -12,7 +12,7 @@ It is a common lisp implementation of Zach Holman's [spark][spark] and Gil Gonç
 The goal of cl-spark is quick data visualization for:
 
  1. quick-and-dirty tasks,
-    (e.g. check the number of http-requests, git-commits, temperature, etc.)
+    (e.g. check the number of http-requests, [github-commits][github-commits], temperature, etc.)
  2. deciding whether the data is worth to real data mining,
     (e.g. [monitoring Fukushima Nuclear Power Station][fukushima-monitor])
  3. grasping the secret aesthetic beauty.
@@ -22,14 +22,15 @@ The goal of cl-spark is quick data visualization for:
 Note:
 
  * The character encoding of cl-spark must be `utf-8`.
-   If your lisp is `ccl`, you need [option][ccl-optione] `$ ccl -K utf-8` when you start `ccl` in shell.
+   If your lisp is `ccl`, you need [option][ccl-option] `$ ccl -K utf-8` when you start `ccl` in shell.
 
 
 [spark]:  https://github.com/holman/spark
 [vspark]: https://github.com/LuRsT/vspark
 [Sparkline theory and practice by Edward Tufte]: http://www.edwardtufte.com/bboard/q-and-a-fetch-msg?msg_id=0001OR
+[github-commits]: https://gist.github.com/tkych/6593401
 [fukushima-monitor]: https://gist.github.com/tkych/6509285
-[ccl-optione]: http://ccl.clozure.com/manual/chapter2.5.html#Command-Line-Options
+[ccl-option]: http://ccl.clozure.com/manual/chapter2.5.html#Command-Line-Options
 
 
 Depends-on
