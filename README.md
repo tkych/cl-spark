@@ -1,4 +1,4 @@
-Last modified: 2013-09-17 21:02:33 tkych
+Last modified: 2013-09-18 20:21:12 tkych
 
 Version: 0.1.02
 
@@ -11,18 +11,19 @@ It is a common lisp implementation of Zach Holman's [spark][spark] and Gil Gonç
 
 The goal of cl-spark is quick data visualization for:
 
- 1. quick-and-dirty tasks,
-    (e.g. check the number of http-requests, [github-commits][github-commits], temperature, etc.)
- 2. deciding whether the data is worth to real data mining,
-    (e.g. [monitoring Fukushima Nuclear Power Station][fukushima-monitor])
- 3. grasping the secret aesthetic beauty.
-    (e.g. visualizing the fibonacci sequence, you can feel the golden ratio)
+ 1. quick-and-dirty tasks
+    (e.g. check the number of http-requests, [github-commits][github-commits], temperature, etc.),
+ 2. deciding whether the data is worth to real data mining
+    (e.g. [monitoring Fukushima Nuclear Power Station][fukushima-monitor]),
+ 3. grasping the secret aesthetic beauty
+    (e.g. visualizing the fibonacci sequence, you can feel the golden ratio).
 
 
 Note:
 
  * The character encoding of cl-spark must be `utf-8`.
-   If your lisp is `ccl`, you need [option][ccl-option] `$ ccl -K utf-8` when you start `ccl` in shell.
+   If your lisp is *clozure*, you need [command-line option][ccl-option] `$ ccl -K utf-8`
+   when you start lisp on the shell.
 
 
 [spark]:  https://github.com/holman/spark
