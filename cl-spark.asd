@@ -1,9 +1,9 @@
-;;;; Last modified: 2013-09-13 19:24:46 tkych
+;;;; Last modified: 2013-09-21 21:51:51 tkych
 
 ;; cl-spark/cl-spark.asd
 
 ;; Copyright (c) 2013 Takaya OCHIAI <tkych.repl@gmail.com>
-;; This software is released under MIT License.
+;; This software is released under the MIT License.
 ;; For more details, see cl-spark/LICENSE
 
 
