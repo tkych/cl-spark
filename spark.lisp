@@ -1,9 +1,9 @@
-;;;; Last modified: 2013-09-16 10:04:19 tkych
+;;;; Last modified: 2013-09-21 21:50:28 tkych
 
 ;; cl-spark/spark.lisp
 
 ;; Copyright (c) 2013 Takaya OCHIAI <tkych.repl@gmail.com>
-;; This software is released under MIT License.
+;; This software is released under the MIT License.
 ;; For more details, see cl-spark/LICENSE
 
 
@@ -41,8 +41,11 @@
 ;; Type
 ;;--------------------------------------------------------------------
 
-(defun at-least-two-chars-p (x)
-  (and (<= 2 (length x)) (every #'characterp x)))
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defun at-least-two-chars-p (x)
+    (and (simple-vector-p x)
+         (<= 2 (length x))
+         (every #'characterp x))))
 
 (deftype <ticks> ()
   `(and simple-vector (satisfies at-least-two-chars-p)))
