@@ -1,4 +1,4 @@
-;;;; Last modified: 2013-09-21 21:50:28 tkych
+;;;; Last modified: 2013-09-27 19:36:48 tkych
 
 ;; cl-spark/spark.lisp
 
@@ -91,17 +91,17 @@ Examples:
 
 ")
 
-(defun spark (values &key min max key)
+(defun spark (numbers &key min max key)
   "Generates a sparkline string for a list of real numbers.
 
-Usage: SPARK <values> &key <min> <max> <key>
+Usage: SPARK <numbers> &key <min> <max> <key>
 
-  * <values> ::= <list> of <real-number>
-  * <min>    ::= { <null> | <real-number> }, default is NIL
-  * <max>    ::= { <null> | <real-number> }, default is NIL
-  * <key>    ::= <function>
+  * <numbers> ::= <list> of <real-number>
+  * <min>     ::= { <null> | <real-number> }, default is NIL
+  * <max>     ::= { <null> | <real-number> }, default is NIL
+  * <key>     ::= <function>
 
-  * <values> ~ data.
+  * <numbers> ~ data.
   * <min>    ~ lower bound of output.
                NIL means the maximum value of the data.
   * <max>    ~ upper bound of output.
@@ -126,26 +126,26 @@ Examples:
 
  For more examples, see cl-spark/test.lisp
 "
-  (check-type values list)
-  (check-type min    (or null real))
-  (check-type max    (or null real))
-  (check-type key    (or null function))
+  (check-type numbers list)
+  (check-type min     (or null real))
+  (check-type max     (or null real))
+  (check-type key     (or null function))
 
-  (when key (setf values (mapcar key values)))
+  (when key (setf numbers (mapcar key numbers)))
 
   ;; Empty data case
-  (when (null values)
+  (when (null numbers)
     (RETURN-FROM spark ""))
 
-  ;; Ensure min is the minimum value
+  ;; Ensure min is the minimum number
   (if (null min)
-      (setf min (reduce #'min values))
-      (setf values (mapcar (lambda (n) (max n min)) values)))
+      (setf min (reduce #'min numbers))
+      (setf numbers (mapcar (lambda (n) (max n min)) numbers)))
 
-  ;; Ensure max is the maximum value
+  ;; Ensure max is the maximum number
   (if (null max)
-      (setf max (reduce #'max values))
-      (setf values (mapcar (lambda (n) (min n max)) values)))
+      (setf max (reduce #'max numbers))
+      (setf numbers (mapcar (lambda (n) (min n max)) numbers)))
 
   (when (< max min)
     (error "max ~S < min ~S." max min))
@@ -158,9 +158,9 @@ Examples:
     ;;   (format *debug-io* "~&max: ~S~&min: ~S~&unit: ~S~%" max min unit))
 
     (loop
-       :for v :in values
-       :for nth := (floor (- v min) unit)
-       ;; :do (when *dbg* (format t "~&~S -> ~S" v nth))
+       :for n :in numbers
+       :for nth := (floor (- n min) unit)
+       ;; :do (when *dbg* (format t "~&~S -> ~S" n nth))
        :collect (svref *ticks* nth) :into acc
        :finally (return (coerce acc 'string)))))
 
@@ -225,14 +225,14 @@ Examples:
 ")
 
 
-(defun vspark (values &key min max key (size 50)
-                           labels title (scale? t) (newline? t))
+(defun vspark (numbers &key min max key (size 50)
+                            labels title (scale? t) (newline? t))
   "Generates a vartical sparkline string for a list of real numbers.
 
-Usage: VSPARK <values> &key <min> <max> <key> <size>
-                            <labels> <title> <scale?> <newline?>
+Usage: VSPARK <numbers> &key <min> <max> <key> <size>
+                             <labels> <title> <scale?> <newline?>
 
-  * <values>   ::= <list> of <real-number>
+  * <numbers>  ::= <list> of <real-number>
   * <min>      ::= { <null> | <real-number> }, default is NIL
   * <max>      ::= { <null> | <real-number> }, default is NIL
   * <key>      ::= <function>
@@ -242,7 +242,7 @@ Usage: VSPARK <values> &key <min> <max> <key> <size>
   * <scale?>   ::= <boolean>, default is T
   * <newline?> ::= <boolean>, default is T
 
-  * <values>   ~ data.
+  * <numbers>  ~ data.
   * <min>      ~ lower bound of output.
                  NIL means the maximum value of the data.
   * <max>      ~ upper bound of output.
@@ -347,7 +347,7 @@ Examples:
 
   For more examples, see cl-spark/test.lisp
 "
-  (check-type values   list)
+  (check-type numbers  list)
   (check-type min      (or null real))
   (check-type max      (or null real))
   (check-type key      (or null function))
@@ -357,21 +357,21 @@ Examples:
   (check-type scale?   boolean)
   (check-type newline? boolean)
 
-  (when key (setf values (mapcar key values)))
+  (when key (setf numbers (mapcar key numbers)))
 
   ;; Empty data case
-  (when (null values)
+  (when (null numbers)
     (RETURN-FROM vspark ""))
 
-  ;; Ensure min is the minimum value
+  ;; Ensure min is the minimum number
   (if (null min)
-      (setf min (reduce #'min values))
-      (setf values (mapcar (lambda (n) (max n min)) values)))
+      (setf min (reduce #'min numbers))
+      (setf numbers (mapcar (lambda (n) (max n min)) numbers)))
 
-  ;; Ensure max is the maximum value
+  ;; Ensure max is the maximum number
   (if (null max)
-      (setf max (reduce #'max values))
-      (setf values (mapcar (lambda (n) (min n max)) values)))
+      (setf max (reduce #'max numbers))
+      (setf numbers (mapcar (lambda (n) (min n max)) numbers)))
 
   ;; Check max ~ min
   (cond ((< max min) (error "max ~S < min ~S." max min))
@@ -380,13 +380,13 @@ Examples:
 
   (let ((max-lengeth-label nil))
     (when labels
-      ;; Ensure num labels equals to num values
-      (let ((diff (- (length values) (length labels))))
+      ;; Ensure num labels equals to num numbers
+      (let ((diff (- (length numbers) (length labels))))
         (cond ((plusp diff)
                ;; Add padding lacking labels not to miss data
                (setf labels (append labels (loop :repeat diff :collect ""))))
               ((minusp diff)
-               ;; Remove maxerfluous labels to remove redundant spaces
+               ;; Remove superfluous labels to remove redundant spaces
                (setf labels (butlast labels (abs diff))))
               (t nil)))
       ;; Find max-lengeth-label
@@ -417,10 +417,10 @@ Examples:
       ;;           max min unit num-content-ticks size))
 
       (loop
-         :for v :in values
+         :for n :in numbers
          :for i :from 0
          :do (when labels (push (nth i labels) result))
-         :do (push (generate-bar v unit min max num-content-ticks)
+         :do (push (generate-bar n unit min max num-content-ticks)
                    result)
          :finally (setf result (nreverse result)))
 
@@ -438,18 +438,18 @@ Examples:
                              (apply #'string-concat result)))
       )))
 
-(defun generate-bar (value unit min max num-content-ticks)
+(defun generate-bar (number unit min max num-content-ticks)
   (multiple-value-bind
-        (units frac) (floor (- value min) (* unit num-content-ticks))
+        (units frac) (floor (- number min) (* unit num-content-ticks))
     ;; (when *dbg*
-    ;;   (format *debug-io* "~&value:~A -> {units: ~A, frac: ~A}"
-    ;;           value units frac))
+    ;;   (format *debug-io* "~&number:~A -> {units: ~A, frac: ~A}"
+    ;;           number units frac))
     (with-output-to-string (s)
       (let ((most-tick (svref *vticks* num-content-ticks)))
         (dotimes (i units) (princ most-tick s))
-        (unless (= value max)
-          ;; max value need not frac.
-          ;; if value = max, then always frac = 0.
+        (unless (= number max)
+          ;; max number need not frac.
+          ;; if number = max, then always frac = 0.
           (princ (svref *vticks* (floor frac unit))
                  s))
         (terpri s)))))

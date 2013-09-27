@@ -1,4 +1,4 @@
-Last modified: 2013-09-18 20:21:12 tkych
+Last modified: 2013-09-27 19:36:18 tkych
 
 Version: 0.1.02
 
@@ -217,11 +217,11 @@ For more examples, see cl-spark/test.lisp
 Referece Manual
 ---------------
 
-#### [Function] SPARK _values_ _&key_ _min_ _max_ _key_
+#### [Function] SPARK _numbers_ _&key_ _min_ _max_ _key_
 
 Generates a sparkline string for a list of real numbers.
 
-  * _values_ is a data, list of real-numbers.
+  * _numbers_ is a data, list of real-numbers.
   * _min_ is lower bound of output, either `nil` or  real-number (default is `NIL`, the maximum value of the data).
   * _max_ is upper bound of output, either `nil` or  real-number (default is `NIL`, the minimum value of the data).
   * _key_ is a function for preparing data.
@@ -233,11 +233,11 @@ A simple-vector of characters for representation of sparklines.
 Default is `#(#\▁ #\▂ #\▃ #\▄ #\▅ #\▆ #\▇ #\█)`.
 
 
-#### [Function] VSPARK _values_ _&key_ _min_ _max_ _key_ _size_ _title_ _labels_ _scale?_ _newline?_
+#### [Function] VSPARK _numbers_ _&key_ _min_ _max_ _key_ _size_ _title_ _labels_ _scale?_ _newline?_
 
 Generates a vartical sparkline string for a list of real numbers.
 
-  * _values_ is a data, list of real-numbers.
+  * _numbers_ is a data, list of real-numbers.
   * _min_ is lower bound of output, either `nil` or real-number (default is `NIL`, the maximum value of the data).
   * _max_ is upper bound of output, either `nil` or real-number (default is `NIL`, the minimum value of the data.).
   * _key_ is a function for preparing data.
