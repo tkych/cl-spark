@@ -1,4 +1,4 @@
-;;;; Last modified: 2013-09-27 19:36:48 tkych
+;;;; Last modified: 2013-10-02 19:38:52 tkych
 
 ;; cl-spark/spark.lisp
 
@@ -103,9 +103,9 @@ Usage: SPARK <numbers> &key <min> <max> <key>
 
   * <numbers> ~ data.
   * <min>    ~ lower bound of output.
-               NIL means the maximum value of the data.
-  * <max>    ~ upper bound of output.
                NIL means the minimum value of the data.
+  * <max>    ~ upper bound of output.
+               NIL means the maximum value of the data.
   * <key>    ~ function for preparing data.
 
 Examples:
@@ -244,9 +244,9 @@ Usage: VSPARK <numbers> &key <min> <max> <key> <size>
 
   * <numbers>  ~ data.
   * <min>      ~ lower bound of output.
-                 NIL means the maximum value of the data.
-  * <max>      ~ upper bound of output.
                  NIL means the minimum value of the data.
+  * <max>      ~ upper bound of output.
+                 NIL means the maximum value of the data.
   * <key>      ~ function for preparing data.
   * <size>     ~ maximum number of output columns (contains label).
   * <labels>   ~ labels for data.

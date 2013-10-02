@@ -1,4 +1,4 @@
-Last modified: 2013-09-27 19:36:18 tkych
+Last modified: 2013-10-02 19:37:51 tkych
 
 Version: 0.1.02
 
@@ -222,8 +222,8 @@ Referece Manual
 Generates a sparkline string for a list of real numbers.
 
   * _numbers_ is a data, list of real-numbers.
-  * _min_ is lower bound of output, either `nil` or  real-number (default is `NIL`, the maximum value of the data).
-  * _max_ is upper bound of output, either `nil` or  real-number (default is `NIL`, the minimum value of the data).
+  * _min_ is lower bound of output, either `nil` or  real-number (default is `NIL`, the minimum value of the data).
+  * _max_ is upper bound of output, either `nil` or  real-number (default is `NIL`, the maximum value of the data).
   * _key_ is a function for preparing data.
 
 
@@ -238,8 +238,8 @@ Default is `#(#\▁ #\▂ #\▃ #\▄ #\▅ #\▆ #\▇ #\█)`.
 Generates a vartical sparkline string for a list of real numbers.
 
   * _numbers_ is a data, list of real-numbers.
-  * _min_ is lower bound of output, either `nil` or real-number (default is `NIL`, the maximum value of the data).
-  * _max_ is upper bound of output, either `nil` or real-number (default is `NIL`, the minimum value of the data.).
+  * _min_ is lower bound of output, either `nil` or real-number (default is `NIL`, the minimum value of the data).
+  * _max_ is upper bound of output, either `nil` or real-number (default is `NIL`, the maximum value of the data).
   * _key_ is a function for preparing data.
   * _size_ is a maximum number of output columns (contains label), integer (default is 50).
   * _title_ is a title for data, string or nil. If title is too big for size, then not print.
