@@ -1,4 +1,4 @@
-Last modified: 2013-10-02 19:37:51 tkych
+Last modified: 2013-10-06 07:41:30 tkych
 
 Version: 0.1.02
 
@@ -37,11 +37,18 @@ Note:
 Depends-on
 ----------
 
- - Independent
+ - NIL
 
 
 Installation
 ------------
+
+#### Auto:
+
+ 0. CL-REPL> `(ql:quickload :cl-spark)`
+
+
+#### Manual:
 
  0. SHELL$   `git clone https://github.com/tkych/cl-spark`
  1. CL-REPL> `(push #p"/path-to-cl-spark/cl-spark/" asdf:*central-registry*)`
@@ -233,7 +240,7 @@ A simple-vector of characters for representation of sparklines.
 Default is `#(#\▁ #\▂ #\▃ #\▄ #\▅ #\▆ #\▇ #\█)`.
 
 
-#### [Function] VSPARK _numbers_ _&key_ _min_ _max_ _key_ _size_ _title_ _labels_ _scale?_ _newline?_
+#### [Function] VSPARK _numbers_ _&key_ _min_ _max_ _key_ (_size_ 50) _title_ _labels_ (_scale?_ t) (_newline?_ t)
 
 Generates a vartical sparkline string for a list of real numbers.
 
@@ -251,8 +258,8 @@ Generates a vartical sparkline string for a list of real numbers.
 
 #### [Special Variable] \*VTICKS\*
 
-A simple-vector of characters for representation of vartical
-sparklines. Default is `#(#\▏ #\▎ #\▍ #\▌ #\▋ #\▊ #\▉ #\█)`.
+A simple-vector of characters for representation of vartical sparklines.
+Default is `#(#\▏ #\▎ #\▍ #\▌ #\▋ #\▊ #\▉ #\█)`.
 
 
 Author, License, Copyright
