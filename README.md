@@ -1,6 +1,6 @@
-Last modified: 2013-10-21 19:51:42 tkych
+Last modified: 2014-06-15 10:42:31 tkych
 
-Version: 0.1.02
+Version: 0.1.13
 
 
 cl-spark
@@ -108,7 +108,7 @@ Examples
     ;;; Vspark
 
     ;; Life expectancy by WHO region, 2011, bothsexes
-    ;; c.f. http://apps.who.int/gho/data/view.main.690
+    ;; see. http://apps.who.int/gho/data/view.main.690
     (defvar life-expectancies '(("Africa" 56)
                                 ("Americans" 76)
                                 ("South-East Asia" 67)

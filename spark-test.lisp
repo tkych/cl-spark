@@ -1,70 +1,120 @@
-;;;; Last modified: 2013-12-12 08:55:00 tkych
+;;;; Last modified: 2014-06-15 10:36:45 tkych
 
-;; cl-spark/test.lisp
+;; cl-spark/spark-test.lisp
 
 ;; Copyright (c) 2013 Takaya OCHIAI <tkych.repl@gmail.com>
 ;; This software is released under the MIT License.
 ;; For more details, see cl-spark/LICENSE
 
-
 ;;====================================================================
-;; Test for CL-Spark
+;; Test for CL-SPARK
 ;;====================================================================
 ;;
-;; Usage:
-;;  CL-REPL> (load "test.lisp")
+;; Usage
+;; -----
+;;
+;;  * (cl-spark-test:run-tests)
+;;
+;;
+;; Notes
+;; -----
+;;
+;;  - Tested: sbcl-1.2.0
+;;
+;;  - When vspark's scale tests fail:
+;;     We use the format-string contains `~<...~>' when vspark's scale is generated.
+;;     `~<...~>' is bit implementation dependent.
+;;     e.g.,
+;;      SBCL> (format nil "~30,,,'-<~A~;~A~;~A~>" 11 222 33)
+;;      => "11-----------222------------33"
+;;      CCL> (format nil "~30,,,'-<~A~;~A~;~A~>" 11 222 33)
+;;      => "11------------222-----------33"
+;;
+;;====================================================================
 
+(in-package #:cl-user)
 
-(in-package :cl-user)
-(defpackage #:cl-spark-test (:use :cl #:cl-spark))
+(defpackage #:cl-spark-test
+  (:use #:cl #:cl-spark #:fiveam)
+  (:export #:run-tests))
+
 (in-package #:cl-spark-test)
 
+(def-suite ?spark-test)
+(in-suite ?spark-test)
 
-(defun =>? (form want)
-  (assert (equal form want)))
+(defun run-tests ()
+  (run! '?spark-test))
+
+(defmacro =>? (form want)
+  (let ((got (gensym "GOT-"))
+        (expected (gensym "EXPECTED-")))
+    `(let ((,got      ,form)
+           (,expected ,want))
+       (is (string-equal ,got ,expected)
+           (format nil "~%~S~
+                        ~%=>~
+                        ~%~S~
+                        ~%=/>~
+                        ~%~S~%"
+                   ',form ,got ,expected)))))
 
 
 ;;--------------------------------------------------------------------
 ;; Spark Tests
 ;;--------------------------------------------------------------------
 
-;; original
+;;; error
 
-(=>? (spark '(1 5 22 13 5))
-     "▁▂█▅▂")
-
-(=>? (spark '(5.5 20))
-     "▁█")
-
-(=>? (spark '(1 2 3 4 100 5 10 20 50 300))
-     "▁▁▁▁▃▁▁▁▂█")
-
-(=>? (spark '(1 50 100))
-     "▁▄█")
-
-(=>? (spark '(2 4 8))
-     "▁▃█")
-
-(=>? (spark '(1 2 3 4 5))
-     "▁▂▄▆█")
-
-(=>? (spark '(0 30 55 80 33 150))
-     "▁▂▃▄▂█")
+(test ?error
+  (signals type-error   (spark :foo))
+  (signals type-error   (spark '(0 1) :min :foo))
+  (signals type-error   (spark '(0 1) :max :foo))
+  (signals type-error   (spark '(0 1) :key #()))
+  (signals simple-error (spark '(0 1) :min 42 :max 24)))
 
 
-;;; limit case
+;;; original
 
-;; null
-(=>? (spark '())
-     "")
+(test ?original
 
-;; singleton
-(=>? (spark '(42))
-     "▁")
+  (=>? (spark '(1 5 22 13 5))
+      "▁▂█▅▂")
 
-;; constant
-(=>? (spark '(42 42))
-     "▁▁")
+  (=>? (spark '(5.5 20))
+      "▁█")
+
+  (=>? (spark '(1 2 3 4 100 5 10 20 50 300))
+      "▁▁▁▁▃▁▁▁▂█")
+
+  (=>? (spark '(1 50 100))
+      "▁▄█")
+
+  (=>? (spark '(2 4 8))
+      "▁▃█")
+
+  (=>? (spark '(1 2 3 4 5))
+      "▁▂▄▆█")
+
+  (=>? (spark '(0 30 55 80 33 150))
+      "▁▂▃▄▂█"))
+
+
+;;; limit
+
+(test ?limit-case
+
+  ;; null
+  (=>? (spark '())
+      "")
+
+  ;; singleton
+  (=>? (spark '(42))
+      "▁")
+
+  ;; constant
+  (=>? (spark '(42 42))
+      "▁▁"))
 
 
 ;;; min, max
@@ -81,71 +131,57 @@
 ;;  2. (spark '(0 1 2 3 4 5 6 7 8 9 10) :key (lambda (x) (min 8 (max 5 x))))
 ;;  3. (spark (mapcar (lambda (x) (min 8 (max 5 x))) '(0 1 2 3 4 5 6 7 8 9 10)))
 
+(test ?max/min
 
-(=>? (spark '(0 30 55 80 33 150) :min -100)
-     "▃▄▅▆▄█")
+  (=>? (spark '(0 30 55 80 33 150) :min -100)
+      "▃▄▅▆▄█")
 
-(=>? (spark '(0 30 55 80 33 150) :max 50)
-     "▁▅██▅█")
+  (=>? (spark '(0 30 55 80 33 150) :max 50)
+      "▁▅██▅█")
 
-(=>? (spark '(0 30 55 80 33 150) :min 30 :max 80)
-     "▁▁▄█▁█")
+  (=>? (spark '(0 30 55 80 33 150) :min 30 :max 80)
+      "▁▁▄█▁█"))
 
 
 ;;; double-float, minus
 
-(=>? (spark '(1.000000000005d0 0.000000000005d0 1.0d0))
+(test ?dfloat-minus
+
+ (=>? (spark '(1.000000000005d0 0.000000000005d0 1.0d0))
      "█▁▇")
 
-(=>? (spark '(-1 0 -1))
+ (=>? (spark '(-1 0 -1))
      "▁█▁")
 
-(=>? (spark '(-1.000000000005d0 0.000000000005d0 -1.0d0))
-     "▁█▁")
+ (=>? (spark '(-1.000000000005d0 0.000000000005d0 -1.0d0))
+     "▁█▁"))
 
 
 ;;; *ticks*
 
-(defparameter ternary '(-1 0 1 -1 1 0 0 -1 1 1 0))
+(test ?*ticks*
 
-(=>? (spark ternary)
-     "▁▄█▁█▄▄▁██▄")
+  (let ((ternaries '(-1 0 1 -1 1 0 0 -1 1 1 0)))
+    (=>? (spark ternaries)
+        "▁▄█▁█▄▄▁██▄")
 
-(=>? (let ((*ticks* #(#\_ #\- #\¯)))
-       (spark ternary))
-     "_-¯_¯--_¯¯-")
+    (=>? (let ((*ticks* #(#\_ #\- #\¯)))
+           (spark ternaries))
+        "_-¯_¯--_¯¯-")
 
-(=>? (let ((*ticks* #(#\▄ #\⎯ #\▀)))
-       (spark ternary))
-     "▄⎯▀▄▀⎯⎯▄▀▀⎯")
+    (=>? (let ((*ticks* #(#\▄ #\⎯ #\▀)))
+           (spark ternaries))
+        "▄⎯▀▄▀⎯⎯▄▀▀⎯")
 
-
-(=>? (let ((*ticks* #(#\E #\O)))
-       (spark '(4 8 15 22 42) :key (lambda (n) (mod n 2))))
-     "EEOEE")
+    (=>? (let ((*ticks* #(#\E #\O)))
+           (spark '(4 8 15 22 42) :key (lambda (n) (mod n 2))))
+        "EEOEE")))
 
 
 ;;; key
 
 (defun range (start end)
   (loop :for i :from start :below end :collect i))
-
-(=>? (spark (range 0 51)
-            :key (lambda (x) (sin (* x pi 1/4))))
-     "▄▆█▆▄▂▁▂▄▆█▆▄▂▁▂▄▆█▆▄▂▁▂▄▆█▆▄▂▁▂▄▆█▆▄▂▁▂▄▆█▆▄▂▁▂▄▆█")
-
-(=>? (spark (range 0 51)
-            :key (lambda (x) (cos (* x pi 1/4))))
-     "█▆▄▂▁▂▄▆█▆▄▂▁▂▄▆█▆▄▂▁▂▄▆█▆▄▂▁▂▄▆█▆▄▂▁▂▄▆█▆▄▂▁▂▄▆█▆▄")
-
-(=>? (spark (range 0 51)
-            :key (lambda (x) (abs (cis (* x pi 1/4)))))
-     "▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁")
-
-(=>? (spark (range 0 51)
-            :key (lambda (x) (float (phase (cis (* x pi 1/4))) 1.0)))
-     "▄▅▆▇█▁▁▂▄▅▆▇█▁▁▂▄▅▆▇█▁▁▂▄▅▆▇█▁▁▂▄▅▆▇█▁▁▂▄▅▆▇█▁▁▂▄▅▆")
-
 
 (defun fib (n)
   (loop :for f1 := 0 :then f2
@@ -160,13 +196,31 @@
                  (rec (1- n) (* n acc)))))
     (rec n 1)))
 
-(=>? (spark (range 1 7) :key #'log)   "▁▃▅▆▇█")
-(=>? (spark (range 1 7) :key #'sqrt)  "▁▃▄▅▆█")
-(=>? (spark (range 1 7))              "▁▂▃▅▆█")
-(=>? (spark (range 1 7) :key #'fib)   "▁▁▂▃▅█")
-(=>? (spark (range 1 7) :key #'exp)   "▁▁▁▁▃█")
-(=>? (spark (range 1 7) :key #'fac)   "▁▁▁▁▂█")
-(=>? (spark (range 1 7) :key #'isqrt) "▁▁▁███")
+(test ?key
+
+  (=>? (spark (range 0 51)
+              :key (lambda (x) (sin (* x pi 1/4))))
+      "▄▆█▆▄▂▁▂▄▆█▆▄▂▁▂▄▆█▆▄▂▁▂▄▆█▆▄▂▁▂▄▆█▆▄▂▁▂▄▆█▆▄▂▁▂▄▆█")
+
+  (=>? (spark (range 0 51)
+              :key (lambda (x) (cos (* x pi 1/4))))
+      "█▆▄▂▁▂▄▆█▆▄▂▁▂▄▆█▆▄▂▁▂▄▆█▆▄▂▁▂▄▆█▆▄▂▁▂▄▆█▆▄▂▁▂▄▆█▆▄")
+
+  (=>? (spark (range 0 51)
+              :key (lambda (x) (float (abs (cis (* x pi 1/4))) 1.0)))
+      "▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁")
+
+  (=>? (spark (range 0 51)
+              :key (lambda (x) (float (phase (cis (* x pi 1/4))) 1.0)))
+      "▄▅▆▇█▁▁▂▄▅▆▇█▁▁▂▄▅▆▇█▁▁▂▄▅▆▇█▁▁▂▄▅▆▇█▁▁▂▄▅▆▇█▁▁▂▄▅▆")
+
+  (=>? (spark (range 1 7) :key #'log)   "▁▃▅▆▇█")
+  (=>? (spark (range 1 7) :key #'sqrt)  "▁▃▄▅▆█")
+  (=>? (spark (range 1 7))              "▁▂▃▅▆█")
+  (=>? (spark (range 1 7) :key #'fib)   "▁▁▂▃▅█")
+  (=>? (spark (range 1 7) :key #'exp)   "▁▁▁▁▃█")
+  (=>? (spark (range 1 7) :key #'fac)   "▁▁▁▁▂█")
+  (=>? (spark (range 1 7) :key #'isqrt) "▁▁▁███"))
 
 
 ;;; misc
@@ -174,43 +228,60 @@
 (defun look-bits (n)
   (spark (map 'list #'digit-char-p (write-to-string n :base 2))))
 
-(=>? (look-bits 42) "█▁█▁█▁")
-(=>? (look-bits 43) "█▁█▁██")
-(=>? (look-bits 44) "█▁██▁▁")
-(=>? (look-bits 45) "█▁██▁█")
+(test ?misc
+  (=>? (look-bits 42) "█▁█▁█▁")
+  (=>? (look-bits 43) "█▁█▁██")
+  (=>? (look-bits 44) "█▁██▁▁")
+  (=>? (look-bits 45) "█▁██▁█"))
 
 
 ;;--------------------------------------------------------------------
 ;; Vspark Tests
 ;;--------------------------------------------------------------------
 
+;;; error
+
+(test ?v-error
+  (signals type-error   (vspark :foo))
+  (signals type-error   (vspark '(0 1) :min :foo))
+  (signals type-error   (vspark '(0 1) :max :foo))
+  (signals type-error   (vspark '(0 1) :key #()))
+  (signals type-error   (vspark '(0 1) :size 0))
+  (signals type-error   (vspark '(0 1) :size -1))
+  (signals type-error   (vspark '(0 1) :labels :foo))
+  (signals simple-error (vspark '(0 1) :min 42 :max 24)))
+
+
 ;;; limit case
 
-;; null
-(=>? (vspark '())
-     "")
+(test ?v-limit
 
-;; singleton
-(=>? (vspark '(1))
+  ;; null
+  (=>? (vspark '())
+      "")
 
-"
+  ;; singleton
+  (=>? (vspark '(1))
+      "
 1                      1.5                       2
 ˫-----------------------+------------------------˧
 ▏
 ")
 
-;; constant
-(=>? (vspark '(1 1))
-"
+  ;; constant
+  (=>? (vspark '(1 1))
+      "
 1                      1.5                       2
 ˫-----------------------+------------------------˧
 ▏
 ▏
-")
+"))
 
 
-(=>? (vspark '(0 30 55 80 33 150))
-"
+(test ?v-normal
+  
+  (=>? (vspark '(0 30 55 80 33 150))
+      "
 0                      75                      150
 ˫-----------------------+------------------------˧
 ▏
@@ -219,13 +290,15 @@
 ██████████████████████████▋
 ███████████▏
 ██████████████████████████████████████████████████
-")
+"))
 
 
 ;;; min, max
 
-(=>? (vspark '(0 30 55 80 33 150) :min -100)
-"
+(test ?v-min/max
+  
+  (=>? (vspark '(0 30 55 80 33 150) :min -100)
+      "
 -100                    25                     150
 ˫-----------------------+------------------------˧
 ████████████████████▏
@@ -236,8 +309,8 @@
 ██████████████████████████████████████████████████
 ")
 
-(=>? (vspark '(0 30 55 80 33 150) :max 50)
-"
+  (=>? (vspark '(0 30 55 80 33 150) :max 50)
+      "
 0                      25                       50
 ˫-----------------------+------------------------˧
 ▏
@@ -249,8 +322,8 @@
 ")
 
 
-(=>? (vspark '(0 30 55 80 33 150) :min 30 :max 80)
-"
+  (=>? (vspark '(0 30 55 80 33 150) :min 30 :max 80)
+      "
 30                      55                      80
 ˫-----------------------+------------------------˧
 ▏
@@ -259,42 +332,48 @@
 ██████████████████████████████████████████████████
 ███▏
 ██████████████████████████████████████████████████
-")
+"))
+
 
 ;;; labels
-(=>? (vspark '(1 0 .5) :labels '("on" "off" "unknown")
-                       :size 1
-                       :scale? nil)
-"
+
+(test ?v-lables
+
+  (=>? (vspark '(1 0 .5) :labels '("on" "off" "unknown")
+                         :size 1
+                         :scale? nil)
+      "
      on █
     off ▏
 unknown ▌
 ")
 
 
-(=>? (vspark '(1 0 .5) :labels '("on" "off")
-                       :size 1
-                       :scale? nil)
-"
+  (=>? (vspark '(1 0 .5) :labels '("on" "off")
+                         :size 1
+                         :scale? nil)
+      "
  on █
 off ▏
     ▌
 ")
 
 
-(=>? (vspark '(1 0) :labels '("on" "off" "unknown")
-                    :size 1
-                    :scale? nil)
-"
+  (=>? (vspark '(1 0) :labels '("on" "off" "unknown")
+                      :size 1
+                      :scale? nil)
+      "
  on █
 off ▏
-")
-
+"))
 
 
 ;;; key
-(=>? (vspark '(0 1 2 3 4 5 6 7 8) :key (lambda (x) (sin (* x pi 1/4))))
-"
+
+(test ?v-key
+
+  (=>? (vspark '(0 1 2 3 4 5 6 7 8) :key (lambda (x) (sin (* x pi 1/4))))
+      "
 -1.0                    0.0                    1.0
 ˫-----------------------+------------------------˧
 █████████████████████████▏
@@ -306,12 +385,16 @@ off ▏
 ▏
 ███████▍
 ████████████████████████▉
-")
+"))
+
 
 ;;; size
-(=>? (vspark '(0 1 2 3 4 5 6 7 8) :key (lambda (x) (sin (* x pi 1/4)))
-             :size 10)
-"
+
+(test ?v-size
+
+  (=>? (vspark '(0 1 2 3 4 5 6 7 8) :key (lambda (x) (sin (* x pi 1/4)))
+                                    :size 10)
+      "
 -1.0   1.0
 ˫--------˧
 █████▏
@@ -323,12 +406,16 @@ off ▏
 ▏
 █▌
 ████▉
-")
+"))
+
 
 ;;; scale (mid-point)
-(=>? (vspark '(0 1 2 3 4 5 6 7 8) :key (lambda (x) (sin (* x pi 1/4)))
-             :size 20)
-"
+
+(test ?scale
+
+  (=>? (vspark '(0 1 2 3 4 5 6 7 8) :key (lambda (x) (sin (* x pi 1/4)))
+                                    :size 20)
+      "
 -1.0     0.0     1.0
 ˫--------+---------˧
 ██████████▏
@@ -340,7 +427,7 @@ off ▏
 ▏
 ██▉
 █████████▉
-")
+"))
 
 
 ;; Life expectancy by WHO region, 2011, bothsexes
@@ -353,8 +440,10 @@ off ▏
                             ("Western Pacific" 76)
                             ("Global" 70)))
 
-(=>? (vspark life-expectancies :key #'second)
-"
+(test ?life
+
+  (=>? (vspark life-expectancies :key #'second)
+      "
 56                      66                      76
 ˫-----------------------+------------------------˧
 ▏
@@ -366,9 +455,9 @@ off ▏
 ███████████████████████████████████▏
 ")
 
-;;; newline?
-(=>? (vspark life-expectancies :key #'second :scale? nil :newline? nil)
-"▏
+  ;; newline?
+  (=>? (vspark life-expectancies :key #'second :scale? nil :newline? nil)
+      "▏
 ██████████████████████████████████████████████████
 ███████████████████████████▌
 ██████████████████████████████████████████████████
@@ -376,9 +465,9 @@ off ▏
 ██████████████████████████████████████████████████
 ███████████████████████████████████▏")
 
-;;; scale?
-(=>? (vspark life-expectancies :key #'second :scale? nil)
-"
+  ;; scale?
+  (=>? (vspark life-expectancies :key #'second :scale? nil)
+      "
 ▏
 ██████████████████████████████████████████████████
 ███████████████████████████▌
@@ -388,11 +477,11 @@ off ▏
 ███████████████████████████████████▏
 ")
 
-;;; labels
-(=>? (vspark life-expectancies
-             :key   #'second
-             :labels (mapcar #'first life-expectancies))
-"
+  ;; labels
+  (=>? (vspark life-expectancies
+               :key   #'second
+               :labels (mapcar #'first life-expectancies))
+      "
                       56           66           76
                       ˫------------+-------------˧
                Africa ▏
@@ -404,13 +493,13 @@ Eastern Mediterranean ████████████████▊
                Global ███████████████████▋
 ")
 
-;;; title
-(=>? (vspark life-expectancies
-             :min 50 :max 80
-             :key    #'second
-             :labels (mapcar #'first life-expectancies)
-             :title "Life Expectancy")
-"
+  ;; title
+  (=>? (vspark life-expectancies
+               :min 50 :max 80
+               :key    #'second
+               :labels (mapcar #'first life-expectancies)
+               :title "Life Expectancy")
+      "
                  Life Expectancy                  
                       50           65           80
                       ˫------------+-------------˧
@@ -421,14 +510,18 @@ Eastern Mediterranean ████████████████▊
 Eastern Mediterranean ████████████████▊
       Western Pacific ████████████████████████▎
                Global ██████████████████▋
-")
+"))
 
 
-(=>? (spark (range 0 15) :key #'fib)
-"▁▁▁▁▁▁▁▁▁▁▂▂▃▅█")
+;;; fib
 
-(=>? (vspark (range 0 15) :key #'fib)
-"
+(test ?fib
+  
+  (=>? (spark (range 0 15) :key #'fib)
+      "▁▁▁▁▁▁▁▁▁▁▂▂▃▅█")
+
+  (=>? (vspark (range 0 15) :key #'fib)
+      "
 0                    188.5                     377
 ˫-----------------------+------------------------˧
 ▏
@@ -446,6 +539,7 @@ Eastern Mediterranean ████████████████▊
 ███████████████████▏
 ██████████████████████████████▉
 ██████████████████████████████████████████████████
-")
+"))
+
 
 ;;====================================================================

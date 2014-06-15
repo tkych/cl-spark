@@ -1,4 +1,4 @@
-;;;; Last modified: 2013-09-21 21:51:51 tkych
+;;;; Last modified: 2014-06-15 10:45:50 tkych
 
 ;; cl-spark/cl-spark.asd
 
@@ -6,21 +6,22 @@
 ;; This software is released under the MIT License.
 ;; For more details, see cl-spark/LICENSE
 
-
 ;;====================================================================
-;; CL-Spark: Quick Data Visualization in Common Lisp.
+;; CL-SPARK: Quick Data Visualization in Common Lisp.
 ;;====================================================================
 ;; cl-spark/
-;;   cl-spark.asd
-;;   spark.lisp
-;;   test.lisp
 ;;   README.md
 ;;   LICENSE
 ;;   CHANGELOG
+;;   cl-spark.asd
+;;   spark.lisp
+;;   test.lisp
+;;   cl-spark-test.asd
+;;   spark-test.asd
 
 
 ;;====================================================================
-;; System for CL-Spark
+;; System for CL-SPARK
 ;;====================================================================
 
 (asdf:defsystem #:cl-spark
@@ -34,11 +35,16 @@ Gil Gonçalves' `vspark' with little extention.
  * vspark:   https://github.com/LuRsT/vspark
  * cl-spark: https://github.com/tkych/cl-spark
 "
-  :version     "0.1.01"
+  :version     "0.1.13"
   :licence     "MIT License"
   :author      "Takaya OCHIAI <tkych.repl@gmail.com>"
-  :components  ((:file "spark"))
-  )
+  :components  ((:file "spark")))
+
+
+(defmethod perform ((o test-op) (s (eql (find-system :cl-spark))))
+  (declare (ignore o s))
+  (load-system :cl-spark-test)
+  (funcall (read-from-string "cl-spark-test:run-tests")))
 
 
 ;;====================================================================
