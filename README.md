@@ -1,7 +1,6 @@
-Last modified: 2014-06-15 10:42:31 tkych
+ver.0.1.13
 
-Version: 0.1.13
-
+[![Build Status](https://travis-ci.org/tkych/cl-spark.png)](https://travis-ci.org/tkych/cl-spark)
 
 cl-spark
 ========
