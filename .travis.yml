@@ -1,0 +1,13 @@
+language: lisp
+
+install:
+ - sudo apt-get update -qq
+ - sudo apt-get install -qq sbcl
+ - curl --no-progress-bar --retry 10  -o quicklisp.lisp -L http://beta.quicklisp.org/quicklisp.lisp
+
+script:
+ - sbcl --script run-tests.lisp
+
+notifications:
+  email:
+    - tkych.repl+travis-ci@gmail.com
