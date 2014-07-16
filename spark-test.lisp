@@ -1,6 +1,4 @@
-;;;; Last modified: 2014-06-15 10:36:45 tkych
-
-;; cl-spark/spark-test.lisp
+;;;; cl-spark/spark-test.lisp
 
 ;; Copyright (c) 2013 Takaya OCHIAI <tkych.repl@gmail.com>
 ;; This software is released under the MIT License.
@@ -44,7 +42,11 @@
 (in-suite ?spark-test)
 
 (defun run-tests ()
-  (run! '?spark-test))
+  (let* ((result-list  (run '?spark-test))
+         (total-result (every (lambda (r) (typep r 'fiveam::test-passed)) ; !
+                              result-list)))
+    (explain! result-list)
+    total-result))
 
 (defmacro =>? (form want)
   (let ((got (gensym "GOT-"))
