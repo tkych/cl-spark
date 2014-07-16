@@ -10,6 +10,8 @@
 ;; Test for CL-SPARK with Travis-CI
 ;;====================================================================
 
+(load "quicklisp.lisp")
+
 (quicklisp-quickstart:install)
 
 (ql:quickload :cl-spark-test)
