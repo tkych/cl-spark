@@ -1,5 +1,3 @@
-;;;; Last modified: 2014-06-15 10:37:56 tkych
-
 ;; cl-spark/spark.lisp
 
 ;; Copyright (c) 2013 Takaya OCHIAI <tkych.repl@gmail.com>
@@ -121,10 +119,10 @@ Examples:
 
   (let ((unit (/ (- max min) (1- (length *ticks*)))))
     (when (zerop unit) (setf unit 1))
-    (loop :for n :in numbers
-          :for nth := (floor (- n min) unit)
-          :collect (svref *ticks* nth) :into acc
-          :finally (return (coerce acc 'string)))))
+    (with-output-to-string (s)
+      (loop :for n :in numbers
+            :for nth := (floor (- n min) unit)
+            :do (princ (svref *ticks* nth) s)))))
 
 
 (setf (documentation 'spark 'function) "
