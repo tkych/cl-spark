@@ -1,6 +1,6 @@
 ;;;; cl-spark/spark.lisp
 
-;; Copyright (c) 2013 Takaya OCHIAI <tkych.repl@gmail.com>
+;; Copyright (c) 2013-2014 Takaya OCHIAI <tkych.repl@gmail.com>
 ;; This software is released under the MIT License.
 ;; For more details, see cl-spark/LICENSE
 
@@ -454,35 +454,51 @@ Examples:
                                     :initial-element #\Space)
                        title-string :start1 mid)))))
 
-(defun ensure-non-double-float (x)
-  (if (integerp x) x (float x 0.0)))
-
-(defun to-string (n)
-  (princ-to-string (ensure-non-double-float n)))
-
 ;; (code-char 743) => #\MODIFIER_LETTER_MID_TONE_BAR              <=> #\˧
 ;; (code-char 746) => #\MODIFIER_LETTER_YANG_DEPARTING_TONE_MARK  <=> #\˫
 (defun generate-scale (min max size max-lengeth-label)
-  (let* ((min-string  (to-string min))
-         (max-string  (to-string max))
-         (num-padding (- size (length min-string) (length max-string))))
-    (when (plusp num-padding)
-      (let* ((mid        (/ (+ max min) 2))
-             (mid-string (to-string mid))
-             (num-indent (aif max-lengeth-label (1+ it) 0)))
-        (if (and (< (length mid-string) num-padding)
-                 (/= min mid)
-                 (/= mid max))
-            ;; A. mid exist case:
-            (format nil "~V,0T~V<~A~;~A~;~A~>~
-                       ~%~V,0T~V,,,'-<~A~;~A~;~A~>~%"
-                    num-indent size min-string mid-string max-string
-                    num-indent size #.(code-char 747) #\+ #.(code-char 743))
-            ;; B. no mid exist case:
-            (format nil "~V,0T~V<~A~;~A~>~
-                       ~%~V,0T~V,,,'-<~A~;~A~>~%"
-                    num-indent size min-string max-string
-                    num-indent size #.(code-char 747) #.(code-char 743)))))))
+  (flet ((to-string (n)
+           (princ-to-string (if (integerp n) n (float n 0.0)))))
+   (let* ((min-string (to-string min))
+          (max-string (to-string max))
+          (num-pad    (- size (length min-string) (length max-string))))
+     (when (plusp num-pad)
+       (let* ((mid        (/ (+ max min) 2))
+              (mid-string (to-string mid))
+              (num-indent (aif max-lengeth-label (1+ it) 0))
+              (num-pad2   (- num-pad (length mid-string))))
+         (if (and (plusp num-pad2)
+                  (/= min mid)
+                  (/= mid max))
+             ;; A. mid exist case:
+             (with-output-to-string (s)
+               (dotimes (_ num-indent) (princ #\Space s))
+               (princ min-string s)
+               (dotimes (_ (ceiling num-pad2 2)) (princ #\Space s))
+               (princ mid-string s)
+               (dotimes (_ (floor num-pad2 2)) (princ #\Space s))
+               (princ max-string s)
+               (princ #\Newline s)
+               (dotimes (_ num-indent) (princ #\Space s))
+               (princ #.(code-char 747) s)
+               (dotimes (_ (ceiling (- size 3) 2)) (princ #\- s))
+               (princ #\+ s)                                                      
+               (dotimes (_ (floor (- size 3) 2)) (princ #\- s))
+               (princ #.(code-char 743) s)                           
+               (princ #\Newline s))
+
+             ;; B. no mid exist case:
+             (with-output-to-string (s)
+               (dotimes (_ num-indent) (princ #\Space s))
+               (princ min-string s)
+               (dotimes (_ num-pad) (princ #\Space s))
+               (princ max-string s)
+               (princ #\Newline s)
+               (dotimes (_ num-indent) (princ #\Space s))
+               (princ #.(code-char 747) s)
+               (dotimes (_ (- size 2)) (princ #\- s))
+               (princ #.(code-char 743) s)                           
+               (princ #\Newline s))))))))
 
 
 ;;====================================================================
