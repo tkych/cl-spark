@@ -1,8 +1,6 @@
-;;;; Last modified: 2014-06-15 10:45:50 tkych
+;;;; cl-spark/cl-spark.asd
 
-;; cl-spark/cl-spark.asd
-
-;; Copyright (c) 2013 Takaya OCHIAI <tkych.repl@gmail.com>
+;; Copyright (c) 2013-2014 Takaya OCHIAI <tkych.repl@gmail.com>
 ;; This software is released under the MIT License.
 ;; For more details, see cl-spark/LICENSE
 
@@ -15,9 +13,9 @@
 ;;   CHANGELOG
 ;;   cl-spark.asd
 ;;   spark.lisp
-;;   test.lisp
 ;;   cl-spark-test.asd
 ;;   spark-test.asd
+;;   .travis.yaml
 
 
 ;;====================================================================
@@ -35,7 +33,7 @@ Gil Gonçalves' `vspark' with little extention.
  * vspark:   https://github.com/LuRsT/vspark
  * cl-spark: https://github.com/tkych/cl-spark
 "
-  :version     "0.1.13"
+  :version     "0.2.00"
   :licence     "MIT License"
   :author      "Takaya OCHIAI <tkych.repl@gmail.com>"
   :components  ((:file "spark")))

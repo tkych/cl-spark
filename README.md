@@ -1,6 +1,7 @@
-Last modified: 2014-06-15 10:42:31 tkych
+ver. 0.2.00 
 
-Version: 0.1.13
+[![Build Status](https://travis-ci.org/tkych/cl-spark.png)](https://travis-ci.org/tkych/cl-spark)
+[cl-test-grid](http://common-lisp.net/project/cl-test-grid/library/cl-spark.html)
 
 
 cl-spark
@@ -274,4 +275,4 @@ Author, License, Copyright
 
 - MIT License
 
-- Copyright (C) 2013 Takaya OCHIAI
+- Copyright (C) 2013-2014 Takaya OCHIAI

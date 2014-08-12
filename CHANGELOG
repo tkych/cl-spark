@@ -1,6 +1,9 @@
-Last modified: 2014-06-15 10:56:28 tkych
-
 cl-spark/CHANGELOG
+
+Version 0.2.00
+2014-08-12
+REFACTOR: VSPARK, GENERATE-SCALE, to be portable.
+ADD: travis.yaml for Travis CI.
 
 Version 0.1.13
 2014-06-15
