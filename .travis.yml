@@ -1,12 +1,22 @@
 language: lisp
 
+env:
+  matrix:
+    - LISP=abcl
+    - LISP=sbcl
+    - LISP=sbcl32
+    - LISP=ccl
+    - LISP=ccl32
+    - LISP=clisp
+    - LISP=clisp32
+    - LISP=cmucl
+    - LISP=ecl
+
 install:
- - sudo apt-get update -qq
- - sudo apt-get install -qq sbcl
- - curl --no-progress-bar --retry 10 -o quicklisp.lisp -L http://beta.quicklisp.org/quicklisp.lisp
+ - curl --no-progress-bar --retry 10 https://raw2.github.com/luismbo/cl-travis/master/install.sh | bash
 
 script:
- - sbcl --script run-tests.lisp
+ - cl-launch -i "(ql:quickload :cl-spark-test) (uiop:quit (if (cl-spark-test:run-tests) 0 1))"
 
 notifications:
   email:
