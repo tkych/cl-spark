@@ -14,6 +14,7 @@
 (asdf:defsystem #:cl-spark-test
   :name        "cl-spark-test"
   :version     "0.1.1"
+  :description "Test for cl-spark"
   :licence     "MIT License"
   :depends-on  (#:cl-spark #:fiveam)
   :author      "Takaya OCHIAI <tkych.repl@gmail.com>"
